@@ -22,6 +22,7 @@ Matched feature-point pairs between successive images are then used to estimate 
 Absolute lengths and angles of the tracked fascicles are provided within the output. 
 
 **References**
+
 Drazan, J.F., Hullfish, T.J., Baxter, J.R., 2019. An automatic fascicle tracking algorithm quantifying gastrocnemius architecture during maximal effort contractions. PeerJ 7, e7120. https://doi.org/10.7717/peerj.7120
 Farris, D.J., Lichtwark, G.A., 2016. UltraTrack: Software for semi-automated tracking of muscle fascicles in sequences of B-mode ultrasound images. Comput Methods Programs Biomed 128, 111–118. https://doi.org/10.1016/j.cmpb.2016.02.016
 Frangi, A.F., Niessen, W.J., Vincken, K.L., Viergever, M.A., 1998. Multiscale vessel enhancement filtering, in: Wells, W.M., Colchester, A., Delp, S. (Eds.), Medical Image Computing and Computer-Assisted Intervention. Springer, Berlin, Heidelberg, pp. 130–137. https://doi.org/10.1007/BFb0056195
