@@ -10,7 +10,7 @@ A Frangi scale range of 1-2 mm is then used and the cropped and filtered images 
 The centroid and orientation of the vessel structures with the largest perimeter in each image are then used to define a line representing each aponeurosis. 
 Using the aponeurosis lines, a region of interest is then defined over the entire width of the image as the area 1 mm below the upper (i.e. superficial or central) aponeurosis and 1 mm above the lower (i.e. central or deep) aponeurosis. 
 To estimate the dominant fascicle orientation within the automatically-defined regions of interest from the same ultrasound image, open-source code was modified to implement a Jerman enhancement filter (https://www.mathworks.com/matlabcentral/fileexchange/63171-jerman-enhancement-filter) to improve the filter response for vessels of varying contrasts and sizes (Jerman et al., 2016a, 2016b). 
-The region of interest was then stretched vertically by a factor of three using bicubic interpolation and the Hough transform (Hough, 1962) is then applied. 
+The region of interest is then stretched vertically by a factor of three using bicubic interpolation and the Hough transform (Hough, 1962) is then applied. 
 Hough lines with orientations of 45° and less than 0-25° are discarded. Note that this 0-25° range is provided as the exact value will be image dependent, and the lower limit should be changed when the dominant fascicle line obviously disagrees with what is visually expected. 
 Linear extrapolation is then performed to find the fascicle endpoints, which reflect the intersections between the aponeurosis lines and the dominant fascicle line, which is centred within the region of interest. 
 
