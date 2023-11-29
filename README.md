@@ -1,5 +1,5 @@
 # UltraTrack_v5_3
-The UltraTrack_v5_3 GUI implements an updated version of UltraTrack (Farris and Lichtwark, 2016), which estimates the lengths and angles (relative to the horizontal) of representative fascicles from a muscle or muscles of interest for each ultrasound image. 
+The UltraTrack_v5_3 GUI implements an updated version of UltraTrack (Farris and Lichtwark, 2016), which estimates the lengths and angles (relative to the horizontal) of representative fascicles from a muscle or muscles of interest from each ultrasound image of an ultrasound video (I recommend tracking .mp4 videos). 
 
 Briefly, the tracking software was updated to track detected feature points within automatically-defined regions of interest across sequential images using a Kanade-Lucas-Tomasi (KLT) feature-point tracking algorithm (Lucas and Kanade, 1981; Shi and Tomasi, 1994). 
 The KLT algorithm was implemented instead of the Lucas-Kanade algorithm (Lucas and Kanade, 1981) because it results in lower root-mean-squared errors between automatically-determined and manually-defined fascicle lengths compared with the earlier version of UltraTrack as mentioned in Drazan et al. (2019).
