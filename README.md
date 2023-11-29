@@ -15,7 +15,7 @@ Hough lines with orientations of 45° and less than 0-25° are discarded. Note t
 Linear extrapolation is then performed to find the fascicle endpoints, which reflect the intersections between the aponeurosis lines and the dominant fascicle line, which is centred within the region of interest. 
 
 Fascicle length and angle changes are estimated by tracking the automatically-defined fascicle endpoints and region of interest locations forward one image at a time using the KLT algorithm (Lucas and Kanade, 1981; Shi and Tomasi, 1994). 
-A point-tracker object is implemented with a block size of 21 (width) × 71 (height) pixels, four pyramid levels, and it performed up to 50 iterations. 
+A point-tracker object is implemented with a block size of 21 (width) × 71 (height) pixels, four pyramid levels, and it performs up to 50 iterations. 
 Feature points are renewed for each image and were detected as corners from within a moving region of interest using a minimum eigenvalue criterion (Shi and Tomasi, 1994). 
 Matched feature-point pairs between successive images are then used to estimate a two-dimensional affine geometric transformation, which requirs a desired confidence of 99% to find the maximum number of matched feature-point pairs, and allows a maximum distance of 50 pixels from one point to the projected location of its corresponding point. 
 
