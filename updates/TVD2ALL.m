@@ -92,11 +92,11 @@ TVDdata.cmPerPixY = cmd.GetUltrasoundPhysicalDeltaY(1);
 % Track PB_15_5_1_Super with below options here and on lab PC
 % Also track it with no processing on lab PC and compare
 % Rej=0, ImEnh=4, speckle reduction=PV 3, B color map=1
-cmd.ParamSet(327,-64); %rejection shift from 0 to 32
-cmd.ParamSet(328,1); %turn on image enhancement
-cmd.ParamSet(329,1); %shift image enhancement from 3 to 4
-cmd.ParamSet(330,1); %turn on speckle reduction
-cmd.ParamSet(337,8); %shift speckle reduction from 3NeatView to 3PureView
+% cmd.ParamSet(327,-64); %rejection shift from 0 to 32
+% cmd.ParamSet(328,1); %turn on image enhancement
+% cmd.ParamSet(329,1); %shift image enhancement from 3 to 4
+% cmd.ParamSet(330,1); %turn on speckle reduction
+% cmd.ParamSet(337,8); %shift speckle reduction from 3NeatView to 3PureView
 %cmd.ParamSet(338,1); %initialise shift B Color Map 
 %cmd.ParamSet(338,1); %shift B Color Map from 1 to 2
 %% Save MAT
