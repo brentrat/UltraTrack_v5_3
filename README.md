@@ -1,8 +1,13 @@
 # UltraTrack_v5_4 is now available
-Several bugs were fixed and image display was sped up. Imaging cropping was improved and images can now be flipped about the middle vertical axis via a checkbox. Redundant settings such as sigma and step size were removed and replaced by block size, which can now be changed within the GUI. Tracking large displacements over long durations will still be problematic due to drift, which is inherent to optical-flow-based tracking, and we are currently in the process of creating a new and improved fascicle tracking version that uses sensor fusion with object and line-based-detection to minimise drift. Unfortunately, I did not extensively test all features in this latest version, so there might still be bugs when: 1) plotting fascicle lengths after correcting keyframes (I try to avoid correcting keyframes by cropping long videos into shorter ones to reduce drift), and; 2) loading in and trying to save additional data (e.g. C3D data). Therefore, please get in contact with me at brent.raiteri@rub.de if you find any bugs or have any questions.
+Several bugs were fixed and image display was sped up. Imaging cropping was improved and images can now be flipped about the middle vertical axis via a checkbox. Redundant settings such as sigma and step size were removed and replaced by block size, which can now be changed within the GUI. 
+---
+Tracking large displacements over long durations will still be problematic due to drift, which is inherent to optical-flow-based tracking, and we are currently in the process of creating a new and improved fascicle tracking version that uses sensor fusion with object and line-based-detection to minimise drift. 
 
+Unfortunately, I did not extensively test all features in this latest version, so there might still be bugs when: 1) plotting fascicle lengths after correcting keyframes (I try to avoid correcting keyframes by cropping long videos into shorter ones to reduce drift), and; 2) loading in and trying to save additional data (e.g. C3D data). Therefore, please get in contact with me at brent.raiteri@rub.de if you find any bugs or have any questions.
+
+---
 The text below describes how this updated version and its predecessor (UltraTrack_v5_3) differ from the version of UltraTrack available at: https://sites.google.com/site/ultratracksoftware/home?authuser=0 
-
+---
 # UltraTrack_v5_3 and later
 The graphical user interface (GUI) implements an updated version of UltraTrack (Farris and Lichtwark, 2016), which estimates the lengths and angles (relative to the horizontal) of representative fascicles from a muscle or muscles of interest from each ultrasound image of an ultrasound video (I recommend tracking .mp4 videos). 
 
