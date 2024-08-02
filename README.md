@@ -1,5 +1,10 @@
+# UltraTrack_v5_4 is now available
+Several bugs were fixed and image display was sped up. Imaging cropping was also improved. Please get in contact with me at brent.raiteri@rub.de if you find any bugs or have any questions.
+
+The text below describes how this updated version and its predecessor (UltraTrack_v5_3) differ from the version of UltraTrack available at: https://sites.google.com/site/ultratracksoftware/home?authuser=0 
+
 # UltraTrack_v5_3
-The UltraTrack_v5_3 GUI implements an updated version of UltraTrack (Farris and Lichtwark, 2016), which estimates the lengths and angles (relative to the horizontal) of representative fascicles from a muscle or muscles of interest from each ultrasound image of an ultrasound video (I recommend tracking .mp4 videos). 
+The graphical user interface (GUI) implements an updated version of UltraTrack (Farris and Lichtwark, 2016), which estimates the lengths and angles (relative to the horizontal) of representative fascicles from a muscle or muscles of interest from each ultrasound image of an ultrasound video (I recommend tracking .mp4 videos). 
 
 Briefly, the tracking software was updated to track detected feature points within automatically-defined regions of interest across sequential images using a Kanade-Lucas-Tomasi (KLT) feature-point tracking algorithm (Lucas and Kanade, 1981; Shi and Tomasi, 1994). 
 The KLT algorithm was implemented instead of the Lucas-Kanade algorithm (Lucas and Kanade, 1981) because it results in lower root-mean-squared errors between automatically-determined and manually-defined fascicle lengths compared with the earlier version of UltraTrack as mentioned in Drazan et al. (2019).
@@ -19,7 +24,7 @@ A point-tracker object is implemented with a block size of 21 (width) × 71 (hei
 Feature points are renewed for each image and are detected as corners from within a moving region of interest using a minimum eigenvalue criterion (Shi and Tomasi, 1994). 
 Matched feature-point pairs between successive images are then used to estimate a two-dimensional affine geometric transformation, which requirs a desired confidence of 99% to find the maximum number of matched feature-point pairs, and allows a maximum distance of 50 pixels from one point to the projected location of its corresponding point. 
 
-Absolute lengths and angles of the tracked fascicles are provided within the output. 
+Absolute lengths and angles of the tracked fascicles are provided within the output. Multiple fascicles and regions can be defined, tracked, and output.
 
 **References**
 
