@@ -1,5 +1,5 @@
 # UltraTrack_v5_4 is now available
-Several bugs were fixed and image display was sped up. Imaging cropping was improved and images can now be flipped about the middle vertical axis via a checkbox. Redundant settings such as sigma and step size were removed and replaced by block size, which can now be changed within the GUI. 
+Several bugs were fixed and image display was sped up. Automatic imaging cropping was improved and images can now be flipped about the middle vertical axis via a checkbox. Redundant settings such as sigma and step size were removed and replaced by block size, which can now be changed within the GUI. 
 ---
 Tracking large displacements over long durations will still be problematic due to drift, which is inherent to optical-flow-based tracking, and we are currently in the process of creating a new and improved fascicle tracking version that uses sensor fusion with object and line-based-detection to minimise drift. 
 
