@@ -90,8 +90,6 @@ end
 % load the settings mat-file and set default settings
 handles.ID = ImageDepth;
 set(handles.ImDepthEdit,'String',num2str(ImageDepth));
-handles.SIGMA = Sigma;
-handles.S_STEP = S_Step;
 set(0,'RecursionLimit',3000)
 set(gcf,'DoubleBuffer','on','Position',Position);
 %cd(Default_Directory)
