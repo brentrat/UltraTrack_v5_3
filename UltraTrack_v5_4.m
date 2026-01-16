@@ -1277,27 +1277,140 @@ if isfield(handles,'ImStack')
 end
 
 % --------------------------------------------------------------------
+% function save_video_Callback(hObject, eventdata, handles)
+% % hObject    handle to save_video (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% if isfield(handles,'ImStack')
+%     [fileout, pathout, FI] = uiputfile('*.mp4', 'Save video as');
+% 
+%     vidObj = VideoWriter([pathout fileout],'MPEG-4');
+%     vidObj.FrameRate = handles.FrameRate;
+%     open(vidObj);
+% 
+%     if FI > 0
+%         for i = 1:1:get(handles.frame_slider,'Max')
+%             set(handles.frame_slider,'Value',i)
+%             show_image(hObject, handles);
+%             F = getframe(handles.axes1);
+%             writeVideo(vidObj,F)
+%         end
+%     end
+%     close(vidObj)
+% 
+% end
+
 function save_video_Callback(hObject, eventdata, handles)
 % hObject    handle to save_video (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 if isfield(handles,'ImStack')
-    [fileout, pathout, FI] = uiputfile('*.mp4', 'Save video as');
 
-    vidObj = VideoWriter([pathout fileout],'MPEG-4');
+    % create new filename for saving
+    filename = [handles.pname, handles.fname(1:end-4), '_tracked'];
+    
+    % create video object for saving with desired properties
+    vidObj = VideoWriter(filename,'MPEG-4');
     vidObj.FrameRate = handles.FrameRate;
     open(vidObj);
 
-    if FI > 0
-        for i = 1:1:get(handles.frame_slider,'Max')
-            set(handles.frame_slider,'Value',i)
-            show_image(hObject, handles);
-            F = getframe(handles.axes1);
-            writeVideo(vidObj,F)
+    % create waitabr
+    h = waitbar(0,['Saving frame 1/', num2str(handles.NumFrames)],'Name','Saving to video file...');
+    i = 1;
+    j = 1;
+
+    % loop through frames
+    for f = handles.start_frame:1:get(handles.frame_slider,'Max')
+
+        if isfield(handles, 'Region')
+            % create tracked frame
+            d = round(size(handles.ImStack,2)/2);
+
+            ZeroPadL = 200*ones(size(handles.ImStack,1), ceil(size(handles.ImStack,2)/2),'uint8');
+            ZeroPadR = 200*ones(size(handles.ImStack,1), floor(size(handles.ImStack,2)/2),'uint8');
+
+            % add padding
+            currentImage = [ZeroPadL, handles.ImStack(:,:,f), ZeroPadR];
+
+            % add fascicle
+            if isfield(handles.Region(i).Fascicle(j), 'fas_y_end') && ~isempty(handles.Region(i).Fascicle(j).fas_y_end{f})
+                fasx = [handles.Region(i).Fascicle(j).fas_x_end{f}];
+                fasy = [handles.Region(i).Fascicle(j).fas_y_end{f}];
+
+            else
+                fasx = handles.Region(i).Fascicle(j).fas_x{f};
+                fasy = handles.Region(i).Fascicle(j).fas_y{f};
+            end
+
+            % commented code as it resulted in plotting the incorrect
+            % fascicle endpoints
+            % currentImage = insertShape(currentImage,'line',[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1), ...
+            %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d,handles.Region(i).Fascicle(j).fas_y{f}(2)], 'LineWidth',5, 'Color','red');
+            %
+            % currentImage = insertMarker(currentImage,[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1);...
+            %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d, handles.Region(i).Fascicle(j).fas_y{f}(2)], 'o', 'Color','red','size',5);
+
+            % correct fascicle endpoints
+            currentImage = insertShape(currentImage,'line',[fasx(1)+d, fasy(1), ...
+                fasx(2)+d,fasy(2)], 'LineWidth',5, 'Color','red');
+
+            currentImage = insertMarker(currentImage,[fasx(1)+d, fasy(1);...
+                fasx(2)+d, fasy(2)], 'o', 'Color','red','size',5);
+
+            % add aponeurosis
+            %currentImage = insertShape(currentImage,'line',[handles.Region(i).sup_x{f}(1)+d, handles.Region(i).sup_y{f}(1), ...
+            %    handles.Region(i).sup_x{f}(2)+d,handles.Region(i).sup_y{f}(2)], 'LineWidth',5, 'Color','blue');
+
+            %currentImage = insertShape(currentImage,'line',[handles.Region(i).deep_x{f}(1)+d, handles.Region(i).deep_y{f}(1), ...
+            %    handles.Region(i).deep_x{f}(2)+d,handles.Region(i).deep_y{f}(2)], 'LineWidth',5, 'Color','green');
+
+            if isfield(handles,'points')
+                if ~isempty(handles.points{f})
+
+                    currentImage = insertMarker(currentImage,[handles.points{f}(:,1)+d, handles.points{f}(:,2)], '+', 'Color','red','size',2);
+                    currentImage = insertText(currentImage, [10 10], ['Number of feature points: ' ,num2str(length(handles.points{f}))],'BoxColor','white');
+                end
+            end
+
+            % add ROI
+            currentImage = insertShape(currentImage,'Polygon',[handles.Region(i).ROIx{f}(1)+d, handles.Region(i).ROIy{f}(1), ...
+                handles.Region(i).ROIx{f}(2)+d, handles.Region(i).ROIy{f}(2),handles.Region(i).ROIx{f}(3)+d, handles.Region(i).ROIy{f}(3),...
+                handles.Region(i).ROIx{f}(4)+d, handles.Region(i).ROIy{f}(4),handles.Region(i).ROIx{f}(5)+d, handles.Region(i).ROIy{f}(5)],'LineWidth',1, 'Color','red');
+
+            % save
+            ImTrack = currentImage;
+        else
+            ImTrack = handles.ImStack(:,:,f);
         end
+
+        if isfield(handles, 'S')
+            if isvalid(handles.S)
+                % show region
+                spos = ceil([handles.S.Position(1:2) ceil(size(handles.ImStack,2)/2) handles.S.Position(4)]);
+                dpos = ceil([handles.D.Position(1:2) ceil(size(handles.ImStack,2)/2) handles.D.Position(4)]);
+
+                ImTrack(spos(2):(spos(2)+spos(4)),spos(1):(spos(1)+spos(3)),3) = 230;
+                ImTrack(dpos(2):(dpos(2)+dpos(4)),dpos(1):(dpos(1)+dpos(3)),2) = 230;
+            end
+        end
+
+        F = ImTrack;
+
+        % save video to video object
+        writeVideo(vidObj,F)
+
+        % update waitbar
+        frac_progress = f/handles.NumFrames;
+        waitbar(frac_progress,h, ['Processing frame ', num2str(f), '/', num2str(get(handles.frame_slider,'Max'))])
+
     end
+    %     end
+
+    % close video object and waitbar
     close(vidObj)
+    close(h)
 
 end
 
