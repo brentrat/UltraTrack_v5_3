@@ -1154,12 +1154,17 @@ if isfield(handles,'ImStack')
         for i = 1:length(Fdat.Region)
 
             for k = 1:length(Fdat.Region(i).Fascicle)
-
-                handles.Region(i).Fascicle(k).fas_x{frame_no} = Fdat.Region(i).Fascicle(k).fas_x;
-                handles.Region(i).Fascicle(k).fas_y{frame_no} = Fdat.Region(i).Fascicle(k).fas_y;
+                % Added cell2mat in case of nested cell array (cell within cell)
+                if iscell(Fdat.Region(i).Fascicle(k).fas_x)
+                    handles.Region(i).Fascicle(k).fas_x{frame_no} = cell2mat(Fdat.Region(i).Fascicle(k).fas_x);
+                    handles.Region(i).Fascicle(k).fas_y{frame_no} = cell2mat(Fdat.Region(i).Fascicle(k).fas_y);
+                else
+                    handles.Region(i).Fascicle(k).fas_x{frame_no} = Fdat.Region(i).Fascicle(k).fas_x;
+                    handles.Region(i).Fascicle(k).fas_y{frame_no} = Fdat.Region(i).Fascicle(k).fas_y;
+                end
 
                 handles.Region(i).Fascicle(k).current_xy(1,1) = handles.Region(i).Fascicle(k).fas_x{frame_no}(1);
-                handles.Region(i).Fascicle(k).current_xy(1,2) = handles.Region(i).Fascicle(k).fas_y{frame_no}(1);
+                handles.Region(i).Fascicle(k).current_xy(1,1) = handles.Region(i).Fascicle(k).fas_y{frame_no}(1);
                 handles.Region(i).Fascicle(k).current_xy(2,1) = handles.Region(i).Fascicle(k).fas_x{frame_no}(2);
                 handles.Region(i).Fascicle(k).current_xy(2,2) = handles.Region(i).Fascicle(k).fas_y{frame_no}(2);
 
@@ -1176,11 +1181,17 @@ if isfield(handles,'ImStack')
 
             Nfascicle(i) = length(handles.Region(i).Fascicle);
 
-            handles.Region(i).ROIx{frame_no} = Fdat.Region(i).ROIx;
-            handles.Region(i).ROIy{frame_no} = Fdat.Region(i).ROIy;
+            % Added cell2mat in case of nested cell array (cell within cell)
+            if iscell(Fdat.Region(i).ROIx)
+                handles.Region(i).ROIx{frame_no} = cell2mat(Fdat.Region(i).ROIx);
+                handles.Region(i).ROIy{frame_no} = cell2mat(Fdat.Region(i).ROIy);
+            else
+                handles.Region(i).ROIx{frame_no} = Fdat.Region(i).ROIx;
+                handles.Region(i).ROIy{frame_no} = Fdat.Region(i).ROIy;
+            end
             if isfield(handles.Region(i),'ROI')
                 handles.Region(i).ROI{frame_no} = Fdat.Region(i).ROI;
-            else
+            else % Used cell2mat
                 handles.Region(i).ROI{frame_no} = poly2mask(handles.Region(i).ROIx{frame_no},handles.Region(i).ROIy{frame_no},handles.vidHeight,handles.vidWidth);
             end
 
@@ -1281,14 +1292,14 @@ end
 % % hObject    handle to save_video (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    structure with handles and user data (see GUIDATA)
-% 
+%
 % if isfield(handles,'ImStack')
 %     [fileout, pathout, FI] = uiputfile('*.mp4', 'Save video as');
-% 
+%
 %     vidObj = VideoWriter([pathout fileout],'MPEG-4');
 %     vidObj.FrameRate = handles.FrameRate;
 %     open(vidObj);
-% 
+%
 %     if FI > 0
 %         for i = 1:1:get(handles.frame_slider,'Max')
 %             set(handles.frame_slider,'Value',i)
@@ -1298,7 +1309,7 @@ end
 %         end
 %     end
 %     close(vidObj)
-% 
+%
 % end
 
 function save_video_Callback(hObject, eventdata, handles)
@@ -1310,7 +1321,7 @@ if isfield(handles,'ImStack')
 
     % create new filename for saving
     filename = [handles.pname, handles.fname(1:end-4), '_tracked'];
-    
+
     % create video object for saving with desired properties
     vidObj = VideoWriter(filename,'MPEG-4');
     vidObj.FrameRate = handles.FrameRate;
@@ -1318,11 +1329,9 @@ if isfield(handles,'ImStack')
 
     % create waitabr
     h = waitbar(0,['Saving frame 1/', num2str(handles.NumFrames)],'Name','Saving to video file...');
-    i = 1;
-    j = 1;
 
     % loop through frames
-    for f = handles.start_frame:1:get(handles.frame_slider,'Max')
+    for f = 1:1:get(handles.frame_slider,'Max')
 
         if isfield(handles, 'Region')
             % create tracked frame
@@ -1332,53 +1341,61 @@ if isfield(handles,'ImStack')
             ZeroPadR = 200*ones(size(handles.ImStack,1), floor(size(handles.ImStack,2)/2),'uint8');
 
             % add padding
-            currentImage = [ZeroPadL, handles.ImStack(:,:,f), ZeroPadR];
+            currentImage = [ZeroPadL, handles.ImStack(:,:,f+handles.start_frame-1), ZeroPadR];
 
-            % add fascicle
-            if isfield(handles.Region(i).Fascicle(j), 'fas_y_end') && ~isempty(handles.Region(i).Fascicle(j).fas_y_end{f})
-                fasx = [handles.Region(i).Fascicle(j).fas_x_end{f}];
-                fasy = [handles.Region(i).Fascicle(j).fas_y_end{f}];
+            % loop through regions then fascicles
+            ii = size(handles.Region,2);
 
-            else
-                fasx = handles.Region(i).Fascicle(j).fas_x{f};
-                fasy = handles.Region(i).Fascicle(j).fas_y{f};
+            for i = 1:ii
+
+                jj = size(handles.Region(i).Fascicle,2);
+
+                for j = 1:jj
+                    if isfield(handles.Region(i).Fascicle(j), 'fas_y_end') && ~isempty(handles.Region(i).Fascicle(j).fas_y_end{f})
+                        fasx = [handles.Region(i).Fascicle(j).fas_x_end{f}];
+                        fasy = [handles.Region(i).Fascicle(j).fas_y_end{f}];
+
+                    else
+                        fasx = handles.Region(i).Fascicle(j).fas_x{f};
+                        fasy = handles.Region(i).Fascicle(j).fas_y{f};
+                    end
+
+                    % commented code as it resulted in plotting the incorrect
+                    % fascicle endpoints
+                    % currentImage = insertShape(currentImage,'line',[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1), ...
+                    %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d,handles.Region(i).Fascicle(j).fas_y{f}(2)], 'LineWidth',5, 'Color','red');
+                    %
+                    % currentImage = insertMarker(currentImage,[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1);...
+                    %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d, handles.Region(i).Fascicle(j).fas_y{f}(2)], 'o', 'Color','red','size',5);
+
+                    % correct fascicle endpoints
+                    currentImage = insertShape(currentImage,'line',[fasx(1)+d, fasy(1), ...
+                        fasx(2)+d,fasy(2)], 'LineWidth',5, 'Color','red');
+
+                    currentImage = insertMarker(currentImage,[fasx(1)+d, fasy(1);...
+                        fasx(2)+d, fasy(2)], 'o', 'Color','red','size',5);
+
+                end
+
+                % add aponeurosis
+                %currentImage = insertShape(currentImage,'line',[handles.Region(i).sup_x{f}(1)+d, handles.Region(i).sup_y{f}(1), ...
+                %    handles.Region(i).sup_x{f}(2)+d,handles.Region(i).sup_y{f}(2)], 'LineWidth',5, 'Color','blue');
+
+                %currentImage = insertShape(currentImage,'line',[handles.Region(i).deep_x{f}(1)+d, handles.Region(i).deep_y{f}(1), ...
+                %    handles.Region(i).deep_x{f}(2)+d,handles.Region(i).deep_y{f}(2)], 'LineWidth',5, 'Color','green');
+
+                % add ROI
+                currentImage = insertShape(currentImage,'Polygon',[handles.Region(i).ROIx{f}(1)+d, handles.Region(i).ROIy{f}(1), ...
+                    handles.Region(i).ROIx{f}(2)+d, handles.Region(i).ROIy{f}(2),handles.Region(i).ROIx{f}(3)+d, handles.Region(i).ROIy{f}(3),...
+                    handles.Region(i).ROIx{f}(4)+d, handles.Region(i).ROIy{f}(4),handles.Region(i).ROIx{f}(5)+d, handles.Region(i).ROIy{f}(5)],'LineWidth',1, 'Color','red');
             end
-
-            % commented code as it resulted in plotting the incorrect
-            % fascicle endpoints
-            % currentImage = insertShape(currentImage,'line',[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1), ...
-            %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d,handles.Region(i).Fascicle(j).fas_y{f}(2)], 'LineWidth',5, 'Color','red');
-            %
-            % currentImage = insertMarker(currentImage,[handles.Region(i).Fascicle(j).fas_x{f}(1)+d, handles.Region(i).Fascicle(j).fas_y{f}(1);...
-            %     handles.Region(i).Fascicle(j).fas_x{f}(2)+d, handles.Region(i).Fascicle(j).fas_y{f}(2)], 'o', 'Color','red','size',5);
-
-            % correct fascicle endpoints
-            currentImage = insertShape(currentImage,'line',[fasx(1)+d, fasy(1), ...
-                fasx(2)+d,fasy(2)], 'LineWidth',5, 'Color','red');
-
-            currentImage = insertMarker(currentImage,[fasx(1)+d, fasy(1);...
-                fasx(2)+d, fasy(2)], 'o', 'Color','red','size',5);
-
-            % add aponeurosis
-            %currentImage = insertShape(currentImage,'line',[handles.Region(i).sup_x{f}(1)+d, handles.Region(i).sup_y{f}(1), ...
-            %    handles.Region(i).sup_x{f}(2)+d,handles.Region(i).sup_y{f}(2)], 'LineWidth',5, 'Color','blue');
-
-            %currentImage = insertShape(currentImage,'line',[handles.Region(i).deep_x{f}(1)+d, handles.Region(i).deep_y{f}(1), ...
-            %    handles.Region(i).deep_x{f}(2)+d,handles.Region(i).deep_y{f}(2)], 'LineWidth',5, 'Color','green');
 
             if isfield(handles,'points')
                 if ~isempty(handles.points{f})
-
                     currentImage = insertMarker(currentImage,[handles.points{f}(:,1)+d, handles.points{f}(:,2)], '+', 'Color','red','size',2);
                     currentImage = insertText(currentImage, [10 10], ['Number of feature points: ' ,num2str(length(handles.points{f}))],'BoxColor','white');
                 end
             end
-
-            % add ROI
-            currentImage = insertShape(currentImage,'Polygon',[handles.Region(i).ROIx{f}(1)+d, handles.Region(i).ROIy{f}(1), ...
-                handles.Region(i).ROIx{f}(2)+d, handles.Region(i).ROIy{f}(2),handles.Region(i).ROIx{f}(3)+d, handles.Region(i).ROIy{f}(3),...
-                handles.Region(i).ROIx{f}(4)+d, handles.Region(i).ROIy{f}(4),handles.Region(i).ROIx{f}(5)+d, handles.Region(i).ROIy{f}(5)],'LineWidth',1, 'Color','red');
-
             % save
             ImTrack = currentImage;
         else
@@ -2898,19 +2915,21 @@ if isfield(handles,'Region')
     i = get(handles.no_tracked_regions,'Value');
     j = get(handles.no_tracked_fascicles,'Value');
 
-    if isfield(handles.Region(i).Fascicle(j),'fas_x_corr') && ~isempty(handles.Region(i).Fascicle(j).fas_x_corr)
-        if size(handles.Region(i).fas_length_corr,1)>=frame_no
+    if isfield(handles.Region,'Fascicle') && ~isempty(handles.Region(i).Fascicle)
+        if isfield(handles.Region(i).Fascicle(j),'fas_x_corr') && ~isempty(handles.Region(i).Fascicle(j).fas_x_corr)
+            if size(handles.Region(i).fas_length_corr,1)>=frame_no
 
-            handles.txt = text(handles.Time(frame_no+handles.start_frame-1)-0.2,handles.Region(i).fas_length_corr(frame_no,j)...
-                ,num2str(round(handles.Region(i).fas_length_corr(frame_no,j))),...
-                'FontSize',10,'FontWeight','bold');
-        end
+                handles.txt = text(handles.Time(frame_no+handles.start_frame-1)-0.2,handles.Region(i).fas_length_corr(frame_no,j)...
+                    ,num2str(round(handles.Region(i).fas_length_corr(frame_no,j))),...
+                    'FontSize',10,'FontWeight','bold');
+            end
 
-    else
-        if size(handles.Region(i).fas_length(:,j),1)>=frame_no
-            handles.txt = text(handles.Time(frame_no+handles.start_frame-1)-0.2,handles.Region(i).fas_length(frame_no,j)...
-                ,num2str(round(handles.Region(i).fas_length(frame_no,j))),...
-                'FontSize',10,'FontWeight','bold');
+        else
+            if size(handles.Region(i).fas_length(:,j),1)>=frame_no
+                handles.txt = text(handles.Time(frame_no+handles.start_frame-1)-0.2,handles.Region(i).fas_length(frame_no,j)...
+                    ,num2str(round(handles.Region(i).fas_length(frame_no,j))),...
+                    'FontSize',10,'FontWeight','bold');
+            end
         end
     end
 end
@@ -2962,7 +2981,7 @@ if isfield(handles,'ImStack')
 
             if isfield(handles.Region(i),'Fascicle')
                 for j = 1:length(handles.Region(i).Fascicle)
-                    if length(handles.Region(1).Fascicle(j).fas_x) >= frame_no
+                    if length(handles.Region(i).Fascicle(j).fas_x) >= frame_no
 
                         %plot the fascicle
                         if isfield(handles.Region(i).Fascicle(j),'fas_x_corr') && ~isempty(handles.Region(i).Fascicle(j).fas_x_corr)
@@ -2978,7 +2997,7 @@ if isfield(handles,'ImStack')
                 end
             end
             % plot the ROI
-            if isfield(handles.Region,'ROI')
+            if isfield(handles.Region,'ROI') && ~isempty(handles.Region(i).ROIx)
                 plot(handles.axes1,handles.Region(i).ROIx{frame_no},handles.Region(i).ROIy{frame_no},'r:','LineWidth',2)
             end
         end
